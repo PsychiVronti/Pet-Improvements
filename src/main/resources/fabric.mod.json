@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "petimprovements",
+	"version": "${version}",
+	"name": "Pet Improvements",
+	"description": "Improves some pet mechanics in Minecraft",
+	"authors": [
+		"Aquamarijn!"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/petimprovements/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.aquamarijn.petimprovements.PetImprovements"
+		],
+		"fabric-datagen": [
+			"com.aquamarijn.petimprovements.PetImprovementsDataGenerator"
+		]
+	},
+	"mixins": [
+		"petimprovements.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
