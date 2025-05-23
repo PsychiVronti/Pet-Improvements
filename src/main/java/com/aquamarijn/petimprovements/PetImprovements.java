@@ -11,6 +11,6 @@ public class PetImprovements implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-
+		LOGGER.info("Pet Improvements loaded successfully!");
 	}
 }

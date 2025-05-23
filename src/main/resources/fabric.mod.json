@@ -9,9 +9,9 @@
 	],
 	"contact": {
 		"homepage": "",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/PsychiVronti/Pet-Improvements"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/petimprovements/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -20,6 +20,9 @@
 		],
 		"fabric-datagen": [
 			"com.aquamarijn.petimprovements.PetImprovementsDataGenerator"
+		],
+		"client": [
+			"com.aquamarijn.petimprovements.PetImprovementsClient"
 		]
 	},
 	"mixins": [
