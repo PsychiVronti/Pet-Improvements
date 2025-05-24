@@ -1,0 +1,27 @@
+{
+  "tooltip.petimprovements.pet_bed.shift_down_line1": "Place this bed and move a pet onto it to set its spawn point.",
+  "tooltip.petimprovements.pet_bed.shift_down_line2": "To remove the spawn point, break the pet bed.",
+  "tooltip.petimprovements.pet_bed": "Press §eShift§r for more information",
+
+  "block.petimprovements.white_pet_bed": "White Pet Bed",
+  "block.petimprovements.orange_pet_bed": "Orange Pet Bed",
+  "block.petimprovements.magenta_pet_bed": "Magenta Pet Bed",
+  "block.petimprovements.light_blue_pet_bed": "Light Blue Pet Bed",
+  "block.petimprovements.yellow_pet_bed": "Yellow Pet Bed",
+  "block.petimprovements.lime_pet_bed": "Lime Pet Bed",
+  "block.petimprovements.pink_pet_bed": "Pink Pet Bed",
+  "block.petimprovements.gray_pet_bed": "Gray Pet Bed",
+  "block.petimprovements.light_gray_pet_bed": "Light_Gray Pet Bed",
+  "block.petimprovements.cyan_pet_bed": "Cyan Pet Bed",
+  "block.petimprovements.purple_pet_bed": "Purple Pet Bed",
+  "block.petimprovements.blue_pet_bed": "Blue Pet Bed",
+  "block.petimprovements.brown_pet_bed": "Brown Pet Bed",
+  "block.petimprovements.green_pet_bed": "Green Pet Bed",
+  "block.petimprovements.red_pet_bed": "Red Pet Bed",
+  "block.petimprovements.black_pet_bed": "Black Pet Bed",
+
+  "itemgroup.petimprovements.pet_improvements_items": "Pet Improvements Mod",
+
+  "text.petimprovements.pet_respawned": "%s has returned to you and can be found on its bed!",
+  "text.petimprovements.pet_spawn_set": "%s's spawn point has been set!"
+}

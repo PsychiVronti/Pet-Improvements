@@ -18,8 +18,8 @@ repositories {
 	// for more information about repositories.
 	mavenCentral()
 	maven {
-		name = "Ladysnake Mods"
-		url = "https://maven.ladysnake.org/releases"
+		name = "Cloth Config API"
+		url = "https://maven.shedaniel.me"
 	}
 }
 
@@ -37,6 +37,9 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	//Cloth Config API
+	modImplementation "me.shedaniel.cloth:cloth-config-fabric:11.1.106"
 
 }
 

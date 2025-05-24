@@ -55,7 +55,8 @@ public abstract class WolfEntityMixin {
                 && entity.getTarget() != null
                 && source.getAttacker() instanceof PlayerEntity
                 && !(entity.getTarget() instanceof  PlayerEntity)) {
-            cir.setReturnValue(false);
+            //returns true to still apply attacks but do not modify health of tamed wolf (sweeping edge
+            cir.setReturnValue(true);
         }
     }
 
