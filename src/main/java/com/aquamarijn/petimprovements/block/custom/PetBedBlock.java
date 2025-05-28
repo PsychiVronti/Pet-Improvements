@@ -17,10 +17,15 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class PetBedBlock extends Block {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger("PetImprovements");
+
 
     //Block outline/hitbox building
     private static final VoxelShape BASE_SHAPE = Block.createCuboidShape(0, 0, 0, 16, 1, 16);
@@ -37,16 +42,18 @@ public class PetBedBlock extends Block {
     //Block collision
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return Block.createCuboidShape(0, 0, 0, 16, 1, 16);
+        return Block.createCuboidShape(0, 0, 0, 16, 3.5, 16);
     }
 
     //Constructor
     public PetBedBlock(Settings settings) {
         super(settings);
+        LOGGER.info("PetBedBlock constructor called for {}", this);
     }
 
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
+        LOGGER.info("onSteppedOn triggered by {} at {}", entity.getName().getString(), pos);
         if (!world.isClient() && entity instanceof TameableEntity tameable && tameable.isTamed()) {
             boolean changed = PetRespawnManager.bindPetIfNew(tameable, pos);
             if (changed && tameable.getOwner() instanceof PlayerEntity player) {
@@ -54,6 +61,7 @@ public class PetBedBlock extends Block {
                         Text.translatable("text.petimprovements.pet_spawn_set", tameable.getName()),
                         false);
             }
+            LOGGER.info("onSteppedOn ran");
         }
         super.onSteppedOn(world, pos, state, entity);
     }
