@@ -12,16 +12,21 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class ModBlocks {
 
     // Map for dynamic retrieval
-    private static final Map<String, Block> PET_BEDS;
+    public static final Map<String, Block> PET_BEDS;
+    public static final Set<Block> PET_BED_BLOCKS = new HashSet<>();
     static {
         PET_BEDS = new HashMap<>();
     }
+
+
 
 
     //Adding custom simple blocks
@@ -58,8 +63,10 @@ public class ModBlocks {
     public static final Block BLACK_PET_BED = registerBlock("black_pet_bed",
             new PetBedBlock(AbstractBlock.Settings.create().strength(0.8f).sounds(BlockSoundGroup.WOOL)));
 
-
-
+    //Adding all registered pet beds to set for easier recall
+    static {
+        PET_BED_BLOCKS.addAll(PET_BEDS.values());
+    }
 
     //Helper methods to register custom blocks
     private static Block registerBlock(String name, Block block) {

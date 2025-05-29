@@ -2,11 +2,9 @@ package com.aquamarijn.petimprovements;
 
 import com.aquamarijn.petimprovements.block.ModBlocks;
 import com.aquamarijn.petimprovements.block.ModItemGroups;
-import com.aquamarijn.petimprovements.entity.PetRespawnManager;
+import com.aquamarijn.petimprovements.util.PetBindThrottle;
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.server.world.ServerWorld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +18,7 @@ public class PetImprovements implements ModInitializer {
 		LOGGER2.info("Pet Improvements mod initializing");
 		ModBlocks.registerModBlocks();
 		ModItemGroups.registerItemGroups();
-
-		ServerTickEvents.END_WORLD_TICK.register(world -> {
-			if (world instanceof ServerWorld serverWorld) {
-				PetRespawnManager.tick(serverWorld);
-			}
-		});
+		PetBindThrottle.registerPetBindThrottle();
 
 		LOGGER.info("Pet Improvements loaded successfully!");
 	}

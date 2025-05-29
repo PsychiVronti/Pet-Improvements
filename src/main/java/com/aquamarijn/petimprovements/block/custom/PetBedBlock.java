@@ -1,16 +1,17 @@
 package com.aquamarijn.petimprovements.block.custom;
 
 import com.aquamarijn.petimprovements.entity.PetRespawnManager;
+import com.aquamarijn.petimprovements.util.PetBindThrottle;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.UUID;
 
 public class PetBedBlock extends Block {
 
@@ -53,15 +55,23 @@ public class PetBedBlock extends Block {
 
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        LOGGER.info("onSteppedOn triggered by {} at {}", entity.getName().getString(), pos);
         if (!world.isClient() && entity instanceof TameableEntity tameable && tameable.isTamed()) {
-            boolean changed = PetRespawnManager.bindPetIfNew(tameable, pos);
-            if (changed && tameable.getOwner() instanceof PlayerEntity player) {
-                player.sendMessage(
-                        Text.translatable("text.petimprovements.pet_spawn_set", tameable.getName()),
-                        false);
+            //Process pet binding once per tick only
+            UUID petId = tameable.getUuid();
+            if (!PetBindThrottle.shouldProcess(petId)) {
+                return;
             }
-            LOGGER.info("onSteppedOn ran");
+
+            boolean wasBound = PetRespawnManager.bindPetIfNew(tameable, pos);
+            if (wasBound) {
+                Entity owner = tameable.getOwner();
+                if (owner instanceof ServerPlayerEntity player) {
+                    player.sendMessage(
+                            Text.translatable("text.petimprovements.pet_spawn_set", tameable.getName()), false);
+                } else {
+                    LOGGER.warn("Unable to send spawn message");
+                }
+            }
         }
         super.onSteppedOn(world, pos, state, entity);
     }
