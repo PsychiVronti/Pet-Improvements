@@ -5,10 +5,12 @@ import com.aquamarijn.petimprovements.block.ModBlocks;
 import com.aquamarijn.petimprovements.util.PetRespawnState;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.ParrotEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
@@ -16,26 +18,30 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class PetRespawnManager {
     private static final Logger LOGGER = LoggerFactory.getLogger("PetImprovements");
 
-
-    public static boolean bindPetIfNew(TameableEntity pet, BlockPos pos) {
+    //Pet binding method
+    public static boolean bindPetToBed(TameableEntity pet, BlockPos pos) {
         if (pet.getWorld().isClient) return false;
 
         ServerWorld world = (ServerWorld) pet.getWorld();
         PetRespawnState state = world.getPersistentStateManager()
                 .getOrCreate(PetRespawnState.TYPE, PetRespawnState.NAME);
-        UUID uuid = pet.getUuid();
-        PetRespawnState.PetRespawnLocation currentLocation = state.getRespawnLocation(uuid);
+        UUID petId = pet.getUuid();
+        PetRespawnState.PetRespawnLocation currentLocation = state.getRespawnLocation(petId);
 
 
-        //Check if bed is unbroken
+        //Checks to see if data needs to be rewritten
         if (currentLocation != null
                 && currentLocation.pos().equals(pos)
                 && currentLocation.dimension().equals(world.getRegistryKey())) {
@@ -43,85 +49,87 @@ public class PetRespawnManager {
             return false;
         }
 
-        state.setRespawnLocation(uuid, pos, world.getRegistryKey());
+        state.setRespawnLocation(petId, pos, world.getRegistryKey());
         LOGGER.info("bindPetIfNew returns true");
-        state.markDirty();
 
         return true;
     }
 
-    public static boolean respawnPet(TameableEntity originalPet, MinecraftServer server) {
-        //Defining original pet data
-        UUID uuid = originalPet.getUuid();
-        ServerWorld overworld = server.getOverworld();
-        PetRespawnState state = overworld.getPersistentStateManager()
+    //Store respawn data method
+    public static void storeRespawnData(TameableEntity pet, ServerWorld world, BlockPos pos, boolean isDead) {
+        if (pet.getWorld().isClient) return;
+
+        PetRespawnState state = world.getPersistentStateManager()
                 .getOrCreate(PetRespawnState.TYPE, PetRespawnState.NAME);
+        UUID petId = pet.getUuid();
+        PetRespawnState.PetRespawnLocation current = state.getRespawnLocation(petId);
 
-        PetRespawnState.PetRespawnLocation currentData = state.getRespawnLocation(uuid);
-        if (currentData == null) return false;
-
-        ServerWorld targetWorld = server.getWorld(currentData.dimension());
-        if (targetWorld == null) return false;
-
-        //Checks if pet bed is unbroken
-        Block bedBlock = targetWorld.getBlockState(currentData.pos()).getBlock();
-        if (!ModBlocks.PET_BED_BLOCKS.contains(bedBlock)) {
-            return false;
-        }
-
-        //Respawn pet by copying dead pet
-        try {
-            Entity entity = originalPet.getType().create(targetWorld);
-            if (entity instanceof TameableEntity newPet) {
-                newPet.setPosition(
-                        currentData.pos().getX() + 0.5,
-                        currentData.pos().getY() + 0.5,
-                        currentData.pos().getZ() + 0.5);
-                newPet.setTamed(true, false);
-                newPet.setOwnerUuid(originalPet.getOwnerUuid());
-                newPet.setCustomName(originalPet.getCustomName());
-                newPet.setHealth(originalPet.getMaxHealth());
-                if (entity instanceof CatEntity newCat && originalPet instanceof CatEntity originalCat) {
-                    newCat.setVariant(originalCat.getVariant());
-                }
-                if (entity instanceof WolfEntity newWolf && originalPet instanceof WolfEntity originalWolf) {
-                    newWolf.setVariant(originalWolf.getVariant());
-                    //Copying over collar color using NBT data
-                    NbtCompound originalNbt = new NbtCompound();
-                    originalWolf.writeNbt(originalNbt);
-                    if (originalNbt.contains("CollarColor", NbtElement.BYTE_TYPE)) {
-                        //Get collar color
-                        byte collarColor = originalNbt.getByte("CollarColor");
-                        //Apply collar color
-                        NbtCompound newNbt = new NbtCompound();
-                        newWolf.writeNbt(newNbt);
-                        newNbt.putByte("CollarColor", collarColor);
-                        newWolf.readNbt(newNbt);
-                    }
-                }
-                if (entity instanceof ParrotEntity newParrot && originalPet instanceof ParrotEntity originalParrot) {
-                    newParrot.setVariant(originalParrot.getVariant());
-                }
-
-                boolean success = targetWorld.spawnEntity(newPet);
-                if (success) {
-                    targetWorld.spawnParticles(
-                            ParticleTypes.HEART,
-                            currentData.pos().getX() + 0.5,
-                            currentData.pos().getY() + 0.5,
-                            currentData.pos().getZ() + 0.5,
-                            8, 0.5, 0.5, 0.5, 0.1
-                    );
-                    if (newPet.getOwner() instanceof net.minecraft.entity.player.PlayerEntity player) {
-                        player.sendMessage(Text.translatable("text.petimprovements.pet_respawned", newPet.getName()), false);
-                    }
-                }
-                return true;
+        if (current != null) {
+            NbtCompound nbt = new NbtCompound();
+            if (pet.saveSelfNbt(nbt)) {
+                state.setPetData(petId, nbt);
             }
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        }
+    }
+
+    //Get respawn data method
+    public static PetRespawnState.PetRespawnLocation getRespawnData(Entity entity) {
+        if (entity.getWorld() instanceof ServerWorld serverWorld) {
+            PetRespawnState state = serverWorld.getPersistentStateManager()
+                    .getOrCreate(PetRespawnState.TYPE, PetRespawnState.NAME);
+            return state.getRespawnLocation(entity.getUuid());
+        }
+        return null;
+    }
+
+    //Respawn method using NBT
+    public static boolean respawnPet(ServerWorld world, UUID uuid, NbtCompound petData, BlockPos pos) {
+        Entity entity = EntityType.loadEntityWithPassengers(petData, world, e -> e);
+        if (entity instanceof TameableEntity newPet) {
+            newPet.setPosition(Vec3d.ofCenter(pos).add(0, 0.5, 0));
+            newPet.setHealth(newPet.getMaxHealth());
+            boolean success = world.spawnEntity(newPet);
+
+            if (success) {
+                world.spawnParticles(ParticleTypes.HEART,
+                        pos.getX() + 0.5,
+                        pos.getY() + 0.5,
+                        pos.getZ() + 0.5,
+                        8, 0.5, 0.5, 0.5, 0.1
+                        );
+                if (newPet.getOwner() instanceof PlayerEntity player) {
+                    player.sendMessage(Text.translatable("text.petimprovements.pet_respawned", newPet.getName()),
+                            false);
+                }
+            }
+            return success;
         }
         return false;
+    }
+
+    //Respawn all pets method
+    public static void respawnAllPendingPets(ServerWorld world) {
+        PetRespawnState state = world.getPersistentStateManager()
+                .getOrCreate(PetRespawnState.TYPE, PetRespawnState.NAME);
+        List<UUID> toRespawn = new ArrayList<>();
+
+        for (Map.Entry<UUID, PetRespawnState.PetRespawnLocation> entry : state.getAllRespawnLocations().entrySet()) {
+            UUID uuid = entry.getKey();
+            PetRespawnState.PetRespawnLocation location = entry.getValue();
+
+            if (location.dimension().equals(world.getRegistryKey())) {
+                NbtCompound petData = state.getPetData(uuid);
+                if (petData != null) {
+                 boolean success = respawnPet(world, uuid, petData, location.pos());
+                 if (success) {
+                     toRespawn.add(uuid);
+                 }
+                }
+            }
+        }
+        for (UUID uuid : toRespawn) {
+            state.remove(uuid);
+        }
     }
 
 }

@@ -1,9 +1,13 @@
 package com.aquamarijn.petimprovements.mixin;
 
 import com.aquamarijn.petimprovements.entity.PetRespawnManager;
+import com.aquamarijn.petimprovements.util.PetRespawnState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,15 +21,18 @@ public abstract class TameableEntityDeathMixin {
     @Unique
     private static final Logger LOGGER = LoggerFactory.getLogger("PetImprovements");
 
-    @Inject(method = "onDeath", at = @At("HEAD"))
-    private void onPetDeath(net.minecraft.entity.damage.DamageSource source, CallbackInfo ci) {
-        Entity self = (Entity) (Object) this;
+    @Inject(method = "onDeath", at = @At("TAIL"))
+    private void onDeathCallback(CallbackInfo ci) {
+        TameableEntity pet = (TameableEntity) (Object)this;
+        World world = pet.getWorld();
 
-        if (!self.getWorld().isClient && self instanceof TameableEntity tameable) {
-            MinecraftServer server = self.getWorld().getServer();
-            LOGGER.info("onPetDeath called for pet {}", self.getUuid());
-            if (server != null) {
-                PetRespawnManager.respawnPet(tameable, server);
+        if (!world.isClient && pet.isTamed() && world instanceof ServerWorld serverWorld) {
+            BlockPos lastBedPos = PetRespawnManager.getRespawnData(pet) != null
+                    ? PetRespawnManager.getRespawnData(pet).pos()
+                    : null;
+
+            if (lastBedPos != null) {
+                PetRespawnManager.storeRespawnData(pet, serverWorld, pet.getBlockPos(), true);
             }
         }
     }

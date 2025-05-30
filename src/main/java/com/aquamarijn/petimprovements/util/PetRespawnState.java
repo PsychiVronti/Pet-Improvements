@@ -26,10 +26,9 @@ public class PetRespawnState extends PersistentState {
             DataFixTypes.LEVEL
     );
 
+    //Pet respawn location management
     public record PetRespawnLocation(BlockPos pos, RegistryKey<World> dimension) {
     }
-
-
     //Setter and getter for pet bed location data
     private final Map<UUID, PetRespawnLocation> respawnPoints = new HashMap<>();
     public void setRespawnLocation(UUID uuid, BlockPos pos, RegistryKey<World> dimension) {
@@ -39,7 +38,24 @@ public class PetRespawnState extends PersistentState {
     public PetRespawnLocation getRespawnLocation(UUID uuid) {
         return respawnPoints.get(uuid);
     }
+    public Map<UUID, PetRespawnLocation> getAllRespawnLocations() {
+        return respawnPoints;
+    }
 
+    //Pet data management
+    private final Map<UUID, NbtCompound> petData = new HashMap<>();
+    public void setPetData(UUID uuid, NbtCompound data) {
+        petData.put(uuid, data);
+        markDirty();
+    }
+    public NbtCompound getPetData(UUID uuid) {
+        return petData.get(uuid);
+    }
+    public void remove(UUID uuid) {
+        petData.remove(uuid);
+        respawnPoints.remove(uuid);
+        markDirty();
+    }
 
 
 

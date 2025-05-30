@@ -53,6 +53,7 @@ public class PetBedBlock extends Block {
         LOGGER.info("PetBedBlock constructor called for {}", this);
     }
 
+    //Bind pet to pet bed for respawn location
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (!world.isClient() && entity instanceof TameableEntity tameable && tameable.isTamed()) {
@@ -62,7 +63,7 @@ public class PetBedBlock extends Block {
                 return;
             }
 
-            boolean wasBound = PetRespawnManager.bindPetIfNew(tameable, pos);
+            boolean wasBound = PetRespawnManager.bindPetToBed(tameable, pos);
             if (wasBound) {
                 Entity owner = tameable.getOwner();
                 if (owner instanceof ServerPlayerEntity player) {
@@ -75,6 +76,7 @@ public class PetBedBlock extends Block {
         }
         super.onSteppedOn(world, pos, state, entity);
     }
+    
 
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
