@@ -25,26 +25,18 @@ public class PetRespawnState extends PersistentState {
             (nbt, ops) ->PetRespawnState.fromNbt(nbt),
             DataFixTypes.LEVEL
     );
-    public static class PetRespawnLocation {
-        public final BlockPos pos;
-        public final RegistryKey<World> dimension;
 
-        public PetRespawnLocation(BlockPos pos, RegistryKey<World> dimension) {
-            this.pos = pos;
-            this.dimension = dimension;
-        }
+    public record PetRespawnLocation(BlockPos pos, RegistryKey<World> dimension) {
     }
 
 
-
-
-    //Setter and getter
+    //Setter and getter for pet bed location data
     private final Map<UUID, PetRespawnLocation> respawnPoints = new HashMap<>();
-    public void setRespawnPoints(UUID uuid, BlockPos pos, RegistryKey<World> dimension) {
+    public void setRespawnLocation(UUID uuid, BlockPos pos, RegistryKey<World> dimension) {
         respawnPoints.put(uuid, new PetRespawnLocation(pos, dimension));
         markDirty();
     }
-    public PetRespawnLocation getRespawnPoint(UUID uuid) {
+    public PetRespawnLocation getRespawnLocation(UUID uuid) {
         return respawnPoints.get(uuid);
     }
 
@@ -52,7 +44,7 @@ public class PetRespawnState extends PersistentState {
 
 
 
-    //Save Nbt data
+    //Save Nbt data for persistent storage
     @Override
     public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         NbtList list = new NbtList();
