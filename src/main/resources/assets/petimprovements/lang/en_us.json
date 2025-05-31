@@ -1,6 +1,7 @@
 {
   "tooltip.petimprovements.pet_bed.shift_down_line1": "Place this bed and move a pet onto it to set its spawn point.",
   "tooltip.petimprovements.pet_bed.shift_down_line2": "To remove the spawn point, break the pet bed.",
+  "tooltip.petimprovements.pet_bed.shift_down_line3": "Right-click the placed bed for your list of bound pets.",
   "tooltip.petimprovements.pet_bed": "Press §eShift§r for more information",
 
   "block.petimprovements.white_pet_bed": "White Pet Bed",

@@ -38,12 +38,10 @@ public class PetRespawnManager {
         if (currentLocation != null
                 && currentLocation.pos().equals(pos)
                 && currentLocation.dimension().equals(world.getRegistryKey())) {
-            LOGGER.info("bed is unbroken, bindPetIfNew returns false");
             return false;
         }
 
         state.setRespawnLocation(petId, pos, world.getRegistryKey());
-        LOGGER.info("bindPetIfNew returns true");
 
         return true;
     }
@@ -61,6 +59,9 @@ public class PetRespawnManager {
             NbtCompound nbt = new NbtCompound();
             if (pet.saveSelfNbt(nbt)) {
                 state.setPetData(petId, nbt);
+                LOGGER.info("Saving pet UUID: {}", pet.getUuid());
+                LOGGER.info("Saving pet owner UUID: {}", pet.getOwnerUuid());
+                LOGGER.info("NBT: {}", nbt);
             }
         }
     }
