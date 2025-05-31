@@ -72,6 +72,7 @@ public class PetRespawnState extends PersistentState {
             tag.putString("Dimension", entry.getValue().dimension.getValue().toString());
             list.add(tag);
         }
+        nbt.put("RespawnPoints", list);
         return nbt;
     }
     //Recall Nbt data
