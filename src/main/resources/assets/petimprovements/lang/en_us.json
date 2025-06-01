@@ -3,6 +3,8 @@
   "tooltip.petimprovements.pet_bed.shift_down_line2": "To remove the spawn point, break the pet bed.",
   "tooltip.petimprovements.pet_bed.shift_down_line3": "Right-click the placed bed for your list of bound pets.",
   "tooltip.petimprovements.pet_bed": "Press §eShift§r for more information",
+  "tooltip.petimprovements.petrespawndisabled.line1": "Pet respawning has been DISABLED in the config",
+  "tooltip.petimprovements.petrespawndisabled.line2": "This block is decorative only",
 
   "block.petimprovements.white_pet_bed": "White Pet Bed",
   "block.petimprovements.orange_pet_bed": "Orange Pet Bed",
@@ -24,5 +26,25 @@
   "itemgroup.petimprovements.pet_improvements_items": "Pet Improvements Mod",
 
   "text.petimprovements.pet_respawned": "%s has returned to you and can be found on its bed!",
-  "text.petimprovements.pet_spawn_set": "%s's spawn point has been set!"
+  "text.petimprovements.pet_spawn_set": "%s's spawn point has been set!",
+
+  "config.petimprovements.title": "Pet Improvements Configuration",
+
+  "config.petimprovements.category.petrespawn": "Pet Respawn",
+  "config.petimprovements.categorydescription.petrespawn": "Configs related to pet respawning mechanics",
+  "config.petimprovements.option.petrespawn": "Enable Pet Respawning",
+  "config.petimprovements.optiondescription.petrespawn": "Enable/Disable the pet respawning mechanics entirely",
+  "config.petimprovements.option.petrespawntime": "Time of Day for Respawn",
+  "config.petimprovements.categorydescription.petrespawntime.line1": "Change the time of day for respawn.",
+  "config.petimprovements.categorydescription.petrespawntime.line2": "Time of day is in Minecraft ticks:",
+  "config.petimprovements.categorydescription.petrespawntime.line3": "0 = 6:00 AM (sunrise)",
+  "config.petimprovements.categorydescription.petrespawntime.line4": "6000 = 12:00 PM (noon)",
+  "config.petimprovements.categorydescription.petrespawntime.line5": "12000 = 6:00 PM (sunset)",
+  "config.petimprovements.categorydescription.petrespawntime.line6": "18000 = 12:00 AM (midnight)",
+  "config.petimprovements.categorydescription.petrespawntime.line7": "24000 = 6:00 AM (new day)",
+
+  "config.petimprovements.category.petwander": "Pet Wander",
+  "config.petimprovements.categorydescription.petwander": "Configs related to pet wandering behavior",
+  "config.petimprovements.option.petwander": "Wander Radius",
+  "config.petimprovements.optiondescription.petwander": "Change pet wandering radius"
 }

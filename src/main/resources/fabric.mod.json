@@ -5,7 +5,7 @@
 	"name": "Pet Improvements",
 	"description": "Improves some pet mechanics in Minecraft",
 	"authors": [
-		"Aquamarijn!"
+		"Aquamarijn"
 	],
 	"contact": {
 		"homepage": "",
@@ -23,6 +23,9 @@
 		],
 		"client": [
 			"com.aquamarijn.petimprovements.PetImprovementsClient"
+		],
+		"modmenu": [
+			"com.aquamarijn.petimprovements.screen.ModMenuCompat"
 		]
 	},
 	"mixins": [

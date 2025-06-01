@@ -1,5 +1,6 @@
 package com.aquamarijn.petimprovements.entity;
 
+import com.aquamarijn.petimprovements.config.ServerConfig;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.CatEntity;
@@ -11,14 +12,12 @@ import java.util.EnumSet;
 public class WanderAroundPointGoal extends Goal {
     private final PathAwareEntity entity;
     private final double speed;
-    private final int radius;
     private final World world;
     private int cooldown;
 
-    public WanderAroundPointGoal(PathAwareEntity entity, double speed, int radius) {
+    public WanderAroundPointGoal(PathAwareEntity entity, double speed) {
         this.entity = entity;
         this.speed = speed;
-        this.radius = radius;
         this.world = entity.getWorld();
         this.setControls(EnumSet.of(Control.MOVE));
     }
@@ -39,6 +38,7 @@ public class WanderAroundPointGoal extends Goal {
     @Override
     public void start() {
         BlockPos center = WanderPositionStorage.getWanderPosition(entity);
+        int radius = ServerConfig.HANDLER.instance().wanderRadius;
         if (center != null) {
             int dx = center.getX() + (world.random.nextInt() * radius * 2) - radius;
             int dz = center.getZ() + (world.random.nextInt() * radius * 2) - radius;

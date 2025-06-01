@@ -1,5 +1,6 @@
 package com.aquamarijn.petimprovements.block.custom;
 
+import com.aquamarijn.petimprovements.config.ServerConfig;
 import com.aquamarijn.petimprovements.entity.PetRespawnManager;
 import com.aquamarijn.petimprovements.util.PetBedDisplayUtil;
 import com.aquamarijn.petimprovements.util.PetBindThrottle;
@@ -8,7 +9,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.CatEntity;
+import net.minecraft.entity.passive.ParrotEntity;
 import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -58,15 +62,30 @@ public class PetBedBlock extends Block {
         super(settings);
     }
 
+    //Allowed pet types
+    private boolean isAllowedPetType(TameableEntity entity) {
+        return entity instanceof WolfEntity
+                || entity instanceof CatEntity
+                || entity instanceof ParrotEntity;
+    }
+
     //Bind pet to pet bed for respawn location
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
+        // Config: Pet Respawn enable/disable
+        if (!ServerConfig.HANDLER.instance().enablePetRespawn) {
+            return;
+        }
+
         if (!world.isClient() && entity instanceof TameableEntity tameable && tameable.isTamed()) {
             //Process pet binding once per tick only
             UUID petId = tameable.getUuid();
             if (!PetBindThrottle.shouldProcess(petId)) {
                 return;
             }
+
+            //Check if pet type is allowed
+            if (!isAllowedPetType(tameable)) return;
 
             boolean wasBound = PetRespawnManager.bindPetToBed(tameable, pos);
             if (wasBound) {
@@ -87,10 +106,13 @@ public class PetBedBlock extends Block {
     }
 
     //Show bound pets
-
-
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        // Config: Pet Respawn enable/disable
+        if (!ServerConfig.HANDLER.instance().enablePetRespawn) {
+            return ActionResult.PASS;
+        }
+
         if (world.isClient) return ActionResult.SUCCESS;
 
         if (player instanceof PlayerEntity serverPlayer) {
@@ -102,6 +124,12 @@ public class PetBedBlock extends Block {
 
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        // Config: Pet Respawn enable/disable
+        if (!ServerConfig.HANDLER.instance().enablePetRespawn) {
+            tooltip.add(Text.translatable("tooltip.petimprovements.petrespawndisabled.line1"));
+            tooltip.add(Text.translatable("tooltip.petimprovements.petrespawndisabled.line2"));
+            return;
+        }
         if (Screen.hasShiftDown()) {
             tooltip.add(Text.translatable("tooltip.petimprovements.pet_bed.shift_down_line1"));
             tooltip.add(Text.translatable("tooltip.petimprovements.pet_bed.shift_down_line2"));

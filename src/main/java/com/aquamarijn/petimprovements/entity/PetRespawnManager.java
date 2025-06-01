@@ -1,6 +1,7 @@
 
 package com.aquamarijn.petimprovements.entity;
 
+import com.aquamarijn.petimprovements.config.ServerConfig;
 import com.aquamarijn.petimprovements.util.PetRespawnState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -12,8 +13,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PetRespawnManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger("PetImprovements");
 
     //Pet binding method
     public static boolean bindPetToBed(TameableEntity pet, BlockPos pos) {
@@ -59,9 +57,6 @@ public class PetRespawnManager {
             NbtCompound nbt = new NbtCompound();
             if (pet.saveSelfNbt(nbt)) {
                 state.setPetData(petId, nbt);
-                LOGGER.info("Saving pet UUID: {}", pet.getUuid());
-                LOGGER.info("Saving pet owner UUID: {}", pet.getOwnerUuid());
-                LOGGER.info("NBT: {}", nbt);
             }
         }
     }
@@ -78,6 +73,11 @@ public class PetRespawnManager {
 
     //Respawn method using NBT
     public static boolean respawnPet(ServerWorld world, UUID uuid, NbtCompound petData, BlockPos pos) {
+        // Config: Pet Respawn enable/disable
+        if (!ServerConfig.HANDLER.instance().enablePetRespawn) {
+            return false;
+        }
+
         Entity entity = EntityType.loadEntityWithPassengers(petData, world, e -> e);
         if (entity instanceof TameableEntity newPet) {
             newPet.setPosition(Vec3d.ofCenter(pos).add(0, 0.5, 0));
