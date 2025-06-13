@@ -11,10 +11,18 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class ConfigScreenBuilder {
-    public static Screen create(Screen parentScreen) {
-        ServerConfig config = ServerConfig.HANDLER.instance();
-        boolean serverSynced = ClientConfig.HANDLER.instance().isServerSynced;
+    private static ClientConfig cfg() {
+        return ClientConfig.HANDLER.instance();
+    }
 
+    public static Screen create(Screen parentScreen) {
+        boolean serverSynced = cfg().isServerSynced;
+
+        // Label Option
+        Text syncedLabel = serverSynced
+                ? Text.translatable("config.petimprovements.serversynced")
+                    .formatted(Formatting.GRAY, Formatting.ITALIC)
+                : Text.empty();
 
         return YetAnotherConfigLib.createBuilder()
                 // TITLE
@@ -25,16 +33,17 @@ public class ConfigScreenBuilder {
                         .name(Text.translatable("config.petimprovements.category.petrespawn"))
                         .tooltip(Text.translatable("config.petimprovements.categorydescription.petrespawn"))
 
-                        // OPTION: Add labeloption
+                        // OPTION: Add labeloption for server sync notice
+                        .option(LabelOption.create(syncedLabel))
 
                         // OPTION: Enable/Disable pet respawning
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.translatable("config.petimprovements.option.petrespawn"))
                                 .description(OptionDescription.of(Text.translatable("config.petimprovements.optiondescription.petrespawn")))
                                 .binding(true,
-                                        () -> config.enablePetRespawn,
+                                        () -> cfg().enablePetRespawn,
                                         newValue -> {
-                                    if (!serverSynced) config.enablePetRespawn = newValue;
+                                    if (!serverSynced) cfg().enablePetRespawn = newValue;
                                         })
                                 .controller(opt -> BooleanControllerBuilder.create(opt)
                                         .formatValue(value -> value ? Text.literal("Enabled") : Text.literal("Disabled"))
@@ -53,9 +62,9 @@ public class ConfigScreenBuilder {
                                         .append("\n").append(Text.translatable("config.petimprovements.categorydescription.petrespawntime.line5"))
                                         .append("\n").append(Text.translatable("config.petimprovements.categorydescription.petrespawntime.line6"))))
                                 .binding(0,
-                                        () -> config.timeOfDay,
+                                        () -> cfg().timeOfDay,
                                         newValue ->  {
-                                            if (!serverSynced) config.timeOfDay = newValue;
+                                            if (!serverSynced) cfg().timeOfDay = newValue;
                                         })
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                         .range(0, 24000)
@@ -63,25 +72,39 @@ public class ConfigScreenBuilder {
                                         .formatValue(value -> Text.literal(value + "")))
                                 .build())
 
-
                         .build())
 
 
-                // CATEGORY: Pet Wander
+                // CATEGORY: Pet Behavior
                 .category(ConfigCategory.createBuilder()
-                        .name(Text.translatable("config.petimprovements.category.petwander"))
-                        .tooltip(Text.translatable("config.petimprovements.categorydescription.petwander"))
+                        .name(Text.translatable("config.petimprovements.category.petbehavior"))
+                        .tooltip(Text.translatable("config.petimprovements.categorydescription.petbehavior"))
+
+                        // OPTION: Add labeloption for server sync notice
+                        .option(LabelOption.create(syncedLabel))
 
                         // OPTION: Enable/Disable
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.translatable("config.petimprovements.option.petwander"))
+                                .description(OptionDescription.of(Text.translatable("config.petimprovements.optiondescription.petwander")))
+                                .binding(true,
+                                        () -> cfg().enablePetWander,
+                                        newValue -> {
+                                            if (!serverSynced) cfg().enablePetWander = newValue;
+                                        })
+                                .controller(opt -> BooleanControllerBuilder.create(opt)
+                                        .formatValue(value -> value ? Text.literal("Enabled") : Text.literal("Disabled"))
+                                        .coloured(true))
+                                .build())
 
                         // OPTION: Change pet wandering radius
                         .option(Option.<Integer>createBuilder()
-                                .name(Text.translatable("config.petimprovements.option.petwander"))
-                                .description(OptionDescription.of(Text.translatable("config.petimprovements.optiondescription.petwander")))
+                                .name(Text.translatable("config.petimprovements.option.petwanderradius"))
+                                .description(OptionDescription.of(Text.translatable("config.petimprovements.optiondescription.petwanderradius")))
                                 .binding(8,
-                                    () -> config.wanderRadius,
+                                    () -> cfg().wanderRadius,
                                         newValue -> {
-                                            if (!serverSynced) config.wanderRadius = newValue;
+                                            if (!serverSynced) cfg().wanderRadius = newValue;
                                         })
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                         .range(3, 64)
@@ -89,9 +112,23 @@ public class ConfigScreenBuilder {
                                         .formatValue(value -> Text.literal(value + " blocks")))
                                 .build())
 
+                        // OPTION: Enable/Disable sound feedback when changing behavior (client-side)
+
+                        // OPTION: Enable/Disable wolf immunity to player attacks
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.translatable("config.petimprovements.option.wolfimmunity"))
+                                .description(OptionDescription.of(Text.translatable("config.petimprovements.optiondescription.wolfimmunity")))
+                                .binding(true,
+                                        () -> cfg().wolfImmuneToPlayer,
+                                        newValue -> {
+                                            if (!serverSynced) cfg().wolfImmuneToPlayer = newValue;
+                                        })
+                                .controller(opt -> BooleanControllerBuilder.create(opt)
+                                        .formatValue(value -> value ? Text.literal("Enabled") : Text.literal("Disabled"))
+                                        .coloured(true))
+                                .build())
+
                         .build())
-
-
 
 
 

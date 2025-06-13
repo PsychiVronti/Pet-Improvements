@@ -1,6 +1,7 @@
 package com.aquamarijn.petimprovements.mixin;
 
 import com.aquamarijn.petimprovements.behavior.BehaviorManager;
+import com.aquamarijn.petimprovements.config.ServerConfig;
 import com.aquamarijn.petimprovements.util.BehaviorType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.WolfEntity;
@@ -11,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WolfEntity.class)
 public abstract class WolfEntityMixin {
+    @Unique
     private BehaviorType behaviorType = BehaviorType.FOLLOW;
 
     @Inject(
@@ -30,20 +33,21 @@ public abstract class WolfEntityMixin {
 
         if (entity.isTamed() && entity.getOwner() == player && stack.isEmpty()) {
             BehaviorType newType = behaviorType.next();
-            behaviorType = newType;
 
-            BehaviorManager.applyBehavior(entity, newType);
-
-            //Overlay feedback
-            if (!player.getWorld().isClient()) {
+            if (newType == BehaviorType.WANDER && !ServerConfig.HANDLER.instance().enablePetWander) {
+                newType = newType.next(); // Skip to FOLLOW
+            } else {
                 player.sendMessage(Text.literal("Behavior set to: " + newType.name()), true);
             }
+
+            behaviorType = newType;
+            BehaviorManager.applyBehavior(entity, newType);
 
             cir.setReturnValue(ActionResult.SUCCESS);
         }
     }
 
-    //Make Wolf immune to player attacks when in combat against non-players
+    // Make Wolf immune to player attacks when in combat against non-players
     @Inject(
             method = "damage",
             at = @At("HEAD"),
@@ -51,11 +55,13 @@ public abstract class WolfEntityMixin {
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         WolfEntity entity = (WolfEntity)(Object)this;
 
-        if (entity.isTamed()
+        if (ServerConfig.HANDLER.instance().wolfImmuneToPlayer
+                && entity.isTamed()
                 && entity.getTarget() != null
                 && source.getAttacker() instanceof PlayerEntity
                 && !(entity.getTarget() instanceof  PlayerEntity)) {
-            //returns true to still apply attacks but do not modify health of tamed wolf (sweeping edge
+            // Exit damage method if the above conditional is true
+            // Returns true to still apply attacks but do not modify health of tamed wolf (sweeping edge compat)
             cir.setReturnValue(true);
         }
     }

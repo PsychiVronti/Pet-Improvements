@@ -1,5 +1,6 @@
 package com.aquamarijn.petimprovements.behavior;
 
+import com.aquamarijn.petimprovements.config.ServerConfig;
 import com.aquamarijn.petimprovements.entity.WanderAroundPointGoal;
 import com.aquamarijn.petimprovements.entity.WanderPositionStorage;
 import com.aquamarijn.petimprovements.mixin.MobEntityAccessor;
@@ -12,16 +13,9 @@ import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
-import static com.aquamarijn.petimprovements.PetImprovements.MOD_ID;
 
 
 public class BehaviorManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static void applyBehavior(TameableEntity entity, BehaviorType type) {
         GoalSelector goals = ((MobEntityAccessor) entity).getGoalSelector();
@@ -43,6 +37,9 @@ public class BehaviorManager {
                 playSound(entity, type);
             }
             case WANDER -> {
+                // Config to enable/disable pet wandering
+                if (!ServerConfig.HANDLER.instance().enablePetWander) return;
+
                 entity.setInSittingPose(false);
                 entity.setSitting(false);
                 BlockPos center = entity.getBlockPos();

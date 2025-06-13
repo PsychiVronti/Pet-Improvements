@@ -29,10 +29,11 @@
   "text.petimprovements.pet_spawn_set": "%s's spawn point has been set!",
 
   "config.petimprovements.title": "Pet Improvements Configuration",
+  "config.petimprovements.serversynced": "Config options are synced with server. Changes will not be saved.",
 
   "config.petimprovements.category.petrespawn": "Pet Respawn",
   "config.petimprovements.categorydescription.petrespawn": "Configs related to pet respawning mechanics",
-  "config.petimprovements.option.petrespawn": "Enable Pet Respawning",
+  "config.petimprovements.option.petrespawn": "Pet Respawning",
   "config.petimprovements.optiondescription.petrespawn": "Enable/Disable the pet respawning mechanics entirely",
   "config.petimprovements.option.petrespawntime": "Time of Day for Respawn",
   "config.petimprovements.categorydescription.petrespawntime.line1": "Change the time of day for respawn.",
@@ -43,8 +44,12 @@
   "config.petimprovements.categorydescription.petrespawntime.line6": "18000 = 12:00 AM (midnight)",
   "config.petimprovements.categorydescription.petrespawntime.line7": "24000 = 6:00 AM (new day)",
 
-  "config.petimprovements.category.petwander": "Pet Wander",
-  "config.petimprovements.categorydescription.petwander": "Configs related to pet wandering behavior",
-  "config.petimprovements.option.petwander": "Wander Radius",
-  "config.petimprovements.optiondescription.petwander": "Change pet wandering radius"
+  "config.petimprovements.category.petbehavior": "Pet Behavior",
+  "config.petimprovements.categorydescription.petbehavior": "Configs related to tamed entity behaviors",
+  "config.petimprovements.option.petwander": "Pet Wandering",
+  "config.petimprovements.optiondescription.petwander": "Enable/Disable pet wandering behavior",
+  "config.petimprovements.option.petwanderradius": "Wander Radius",
+  "config.petimprovements.optiondescription.petwanderradius": "Change pet wandering radius",
+  "config.petimprovements.option.wolfimmunity": "Wolf Immune to Player Attacks During Combat",
+  "config.petimprovements.optiondescription.wolfimmunity": "Enable/Disable tamed wolves being immune to player attacks during combat (when the wolf has an attack target)."
 }

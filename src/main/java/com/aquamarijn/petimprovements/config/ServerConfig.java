@@ -12,15 +12,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ServerConfig {
-    //Making options
+    // Making options
+    // Also update: ClientConfig, SyncedPetconfig, and PacketCodec in config payload record
+    // Update YACL GUI builder
     @SerialEntry(comment = "Enable/Disable the pet respawning mechanics entirely. Pet Bed block will become decorative only.")
     public boolean enablePetRespawn = true; // enabled
 
-    @SerialEntry(comment = "Change pet wander radius, integers represent blocks")
+    @SerialEntry(comment = "Set time of day for when dead pets bound to pet beds will respawn. Integers represent ticks (24000 ticks in a Minecraft day).")
+    public int timeOfDay = 0; // 6AM
+
+    @SerialEntry(comment = "Enable/Disable the additional pet wandering behavior entirely.")
+    public boolean enablePetWander = true; // enabled
+
+    @SerialEntry(comment = "Change pet wander radius, integers represent blocks.")
     public int wanderRadius = 8; // 8 blocks
 
-    @SerialEntry(comment = "Set time of day for when dead pets bound to pet beds will respawn. Integers represent ticks (24000 ticks in a Minecraft day)")
-    public int timeOfDay = 0; // 6AM
+    @SerialEntry(comment = "Enable/Disable tamed wolves to be immune from player attacks when in combat.")
+    public boolean wolfImmuneToPlayer = true; // enabled
+
 
 
     // Config file path
@@ -35,7 +44,7 @@ public class ServerConfig {
         }
     }
 
-    //Setting up config json file
+    // Setting up config json file
     public static ConfigClassHandler<ServerConfig> HANDLER = ConfigClassHandler.createBuilder(ServerConfig.class)
             .id(Identifier.of("petimprovements", "server_config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
